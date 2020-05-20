@@ -38,12 +38,13 @@ if not os.path.exists('output'):
 relative=True
 adapt_movement_scale=True
 cpu=False
-print("[INFO] Initializing front camera...")
 
 if video_path:
     cap = cv2.VideoCapture(video_path) 
+    print("[INFO] Loading video from the given path")
 else:
     cap = cv2.VideoCapture(0)
+    print("[INFO] Initializing front camera...")
 
 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 out1 = cv2.VideoWriter('output/test.avi', fourcc, 12, (256*3 , 256), True)

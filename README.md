@@ -33,7 +33,11 @@ Delete zip file : ```rm checkpoints.zip```
 
 ## Step 5 : Run the project
 
-Run python file : ``` python make_animations.py ```
+Run application from live camera : ```python image_animation.py -i path_to_input_file -c path_to_checkpoint```
 
+example : ```python .\image_animation.py -i .\Inputs\Monalisa.png -c .\checkpoints\vox-cpk.pth.tar```
+
+Run application from video file : ```python image_animation.py -i path_to_input_file -c path_to_checkpoint -v path_to_video_file```
+
+example : ```
 ![test demo](animate.gif)
-
