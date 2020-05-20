@@ -39,5 +39,5 @@ example : ```python .\image_animation.py -i .\Inputs\Monalisa.png -c .\checkpoin
 
 Run application from video file : ```python image_animation.py -i path_to_input_file -c path_to_checkpoint -v path_to_video_file```
 
-example : ```
+example : ``` ```python .\image_animation.py -i .\Inputs\Monalisa.png -c .\checkpoints\vox-cpk.pth.tar -v .\video_input\test1.mp4```
 ![test demo](animate.gif)
