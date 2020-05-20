@@ -42,3 +42,8 @@ If on windows platfrom unzip checkpoints.zip using unzipping software like 7zip.
 **Example** : ```python .\image_animation.py -i .\Inputs\Monalisa.png -c .\checkpoints\vox-cpk.pth.tar -v .\video_input\test1.mp4 ```
 
 ![test demo](animate.gif)
+
+### TODO:
+Tkinter version
+need to work on face alignments
+
