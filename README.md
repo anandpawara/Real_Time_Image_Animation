@@ -57,7 +57,7 @@ Credits
   booktitle = {Conference on Neural Information Processing Systems (NeurIPS)},
   month = {December},
   year = {2019},
-  url          = {https://github.com/AliaksandrSiarohin/first-order-model}
+  url = {https://github.com/AliaksandrSiarohin/first-order-model}
 }
 ```
 - Original Project
