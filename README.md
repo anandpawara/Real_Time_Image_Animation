@@ -51,8 +51,14 @@ need to work on face alignments
 Credits
 =======
 
-<!-- - Original Project
-    * [AliaksandrSiarohin](https://github.com/AliaksandrSiarohin/first-order-model)<br/> -->
+@InProceedings{Siarohin_2019_NeurIPS,
+  author={Siarohin, Aliaksandr and Lathuilière, Stéphane and Tulyakov, Sergey and Ricci, Elisa and Sebe, Nicu},
+  title={First Order Motion Model for Image Animation},
+  booktitle = {Conference on Neural Information Processing Systems (NeurIPS)},
+  month = {December},
+  year = {2019},
+  url          = {https://github.com/AliaksandrSiarohin/first-order-model}
+}
 - Original Project
     * [AliaksandrSiarohin](https://github.com/AliaksandrSiarohin/first-order-model)
 
