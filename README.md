@@ -45,8 +45,10 @@ If on windows platfrom unzip checkpoints.zip using unzipping software like 7zip.
 
 ### TODO:
 Tkinter version
-need to work on face alignments
 
+Need work on face alignments
+
+Future plans adding deepfake voice and merging with video
 
 Credits
 =======
