@@ -66,7 +66,8 @@ Credits
     If you like this project give your support to original author of this project by giving github star to author's project
 
 - video explanation to the project <br/>
-    * [Two mins paper](https://www.youtube.com/watch?v=u-0cQ-grXBQ)
+    * [Video explanation by original author](https://www.youtube.com/watch?v=u-0cQ-grXBQ)
+    * [Two min papers](https://www.youtube.com/watch?v=mUfJOQKdtAk)    
 
 - try project on google colab
     * [youtube link](https://www.youtube.com/watch?v=RsOJJd1q6Bg&feature=youtu.be)
