@@ -5,6 +5,8 @@ The Project is real time application in opencv using first order model
 
 ## Step 1: Create virtual environment
 
+**Python version** : python v3.7.3
+
 **create virual environment** : ```pip install virtualenv```
 
 **activate virtual environment** : ```virtualenv env```
