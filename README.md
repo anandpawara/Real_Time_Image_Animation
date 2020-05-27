@@ -26,6 +26,8 @@ The Project is real time application in opencv using first order model
 ## Step 4 : Download cascade file ,weights and model and save in folder named extract
 
 ```gdown --id 1wCzJP1XJNB04vEORZvPjNz6drkXm5AUK```
+The file is also availible via direct link on Google's Drive:
+https://drive.google.com/uc?id=1wCzJP1XJNB04vEORZvPjNz6drkXm5AUK
 
 **On Linux machine** : ```unzip checkpoints.zip```
 
