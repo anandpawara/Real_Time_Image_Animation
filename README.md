@@ -19,7 +19,7 @@ The Project is real time application in opencv using first order model
 
 ## Step 3 : Install required modules
 
-**Install modules** : ``` pip install -r requirements.txt ```
+**Install modules** : ``` pip install -r requirements.txt ``` or ``` pip install -r requirements_notwin.txt ``` if you are not going to use windows (Linux, MacOS) 
 
 **Install pytorch and torchvision** : ```pip install torch===1.0.0 torchvision===0.2.1 -f https://download.pytorch.org/whl/cu100/torch_stable.html ```
 

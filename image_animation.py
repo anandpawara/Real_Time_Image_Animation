@@ -29,15 +29,14 @@ else:
 source_image = imageio.imread(source_path)
 source_image = resize(source_image,(256,256))[..., :3]
 
-generator, kp_detector = load_checkpoints(config_path='config/vox-256.yaml', checkpoint_path=checkpoint_path)
+relative=True
+adapt_movement_scale=True
+cpu=True
+
+generator, kp_detector = load_checkpoints(config_path='config/vox-256.yaml', checkpoint_path=checkpoint_path, cpu=cpu)
 
 if not os.path.exists('output'):
     os.mkdir('output')
-
-
-relative=True
-adapt_movement_scale=True
-cpu=False
 
 if video_path:
     cap = cv2.VideoCapture(video_path) 
