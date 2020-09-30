@@ -79,5 +79,5 @@ Credits
     * [youtube link](https://www.youtube.com/watch?v=RsOJJd1q6Bg&feature=youtu.be)
     * [link to colab version](https://colab.research.google.com/github/AliaksandrSiarohin/first-order-model/blob/master/demo.ipynb)
 
-    For any valueable feedback feel free to contact me on [linkedin](https://www.linkedin.com/in/anand-pawara-8045/)
+    For any valueable feedback or feature requests, please feel free to contact me via [LinkedIn](https://www.linkedin.com/in/anand-pawara-8045/)
 
