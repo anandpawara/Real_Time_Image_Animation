@@ -1,5 +1,5 @@
 # Real time Image Animation
-The Project is real time application in opencv using first order model
+This Project is a real time application in opencv using first order model.
 
 # Steps to setup
 
@@ -7,9 +7,9 @@ The Project is real time application in opencv using first order model
 
 **Python version** : python v3.7.3 or higher
 
-**create virual environment** : ```pip install virtualenv```
+**Create virual environment** : ```pip install virtualenv```
 
-**activate virtual environment** : ```virtualenv env```
+**Activate virtual environment** : ```virtualenv env```
 
 ## Step 2: Activate virtual environment
 
@@ -31,7 +31,7 @@ https://drive.google.com/uc?id=1wCzJP1XJNB04vEORZvPjNz6drkXm5AUK
 
 **On Linux machine** : ```unzip checkpoints.zip```
 
-If on windows platfrom unzip checkpoints.zip using unzipping software like 7zip.
+If on windows platfrom unzip checkpoints.zip using unzipping software like 7zip and WinRAR.
 
 **Delete zip file** : ```rm checkpoints.zip```
 
