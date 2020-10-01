@@ -8,8 +8,10 @@ from skimage.draw import circle
 
 import matplotlib.pyplot as plt
 import collections
+ 
+    
 
-
+print("welcome to this amazing platform")
 class Logger:
     def __init__(self, log_dir, checkpoint_freq=100, visualizer_params=None, zfill_num=8, log_file_name='log.txt'):
 
@@ -206,3 +208,4 @@ class Visualizer:
         image = self.create_image_grid(*images)
         image = (255 * image).astype(np.uint8)
         return image
+    print("thx visit again")
