@@ -13,7 +13,7 @@ The Project is real time application in opencv using first order model
 
 ## Step 2: Activate virtual environment
 
-**For windows** : ```env/Script/activate```
+**For windows** : ```env/Scripts/activate```
 
 **For Linux** : ```source env/bin/activate```
 
