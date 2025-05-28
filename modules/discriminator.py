@@ -1,7 +1,7 @@
-from torch import nn
-import torch.nn.functional as F
-from modules.util import kp2gaussian
 import torch
+import torch.nn.functional as F
+from torch import nn
+from modules.util import kp2gaussian
 
 
 class DownBlock2d(nn.Module):
@@ -12,14 +12,9 @@ class DownBlock2d(nn.Module):
     def __init__(self, in_features, out_features, norm=False, kernel_size=4, pool=False, sn=False):
         super(DownBlock2d, self).__init__()
         self.conv = nn.Conv2d(in_channels=in_features, out_channels=out_features, kernel_size=kernel_size)
+        self.conv = nn.utils.spectral_norm(self.conv) if sn else self.conv
 
-        if sn:
-            self.conv = nn.utils.spectral_norm(self.conv)
-
-        if norm:
-            self.norm = nn.InstanceNorm2d(out_features, affine=True)
-        else:
-            self.norm = None
+        self.norm = nn.InstanceNorm2d(out_features, affine=True) if norm else None
         self.pool = pool
 
     def forward(self, x):
@@ -38,21 +33,36 @@ class Discriminator(nn.Module):
     Discriminator similar to Pix2Pix
     """
 
-    def __init__(self, num_channels=3, block_expansion=64, num_blocks=4, max_features=512,
-                 sn=False, use_kp=False, num_kp=10, kp_variance=0.01, **kwargs):
+    def __init__(
+        self,
+        num_channels=3,
+        block_expansion=64,
+        num_blocks=4,
+        max_features=512,
+        sn=False,
+        use_kp=False,
+        num_kp=10,
+        kp_variance=0.01,
+        **_
+    ) -> None:
         super(Discriminator, self).__init__()
 
         down_blocks = []
         for i in range(num_blocks):
             down_blocks.append(
-                DownBlock2d(num_channels + num_kp * use_kp if i == 0 else min(max_features, block_expansion * (2 ** i)),
-                            min(max_features, block_expansion * (2 ** (i + 1))),
-                            norm=(i != 0), kernel_size=4, pool=(i != num_blocks - 1), sn=sn))
+                DownBlock2d(
+                    num_channels + num_kp * use_kp if i == 0 else min(max_features, block_expansion * (2 ** i)),
+                    min(max_features, block_expansion * (2 ** (i + 1))),
+                    norm=(i != 0),
+                    kernel_size=4,
+                    pool=(i != num_blocks - 1),
+                    sn=sn
+                )
+            )
 
         self.down_blocks = nn.ModuleList(down_blocks)
         self.conv = nn.Conv2d(self.down_blocks[-1].conv.out_channels, out_channels=1, kernel_size=1)
-        if sn:
-            self.conv = nn.utils.spectral_norm(self.conv)
+        self.conv = nn.utils.spectral_norm(self.conv) if sn else self.conv
         self.use_kp = use_kp
         self.kp_variance = kp_variance
 

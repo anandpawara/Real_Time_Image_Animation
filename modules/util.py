@@ -213,10 +213,8 @@ class AntiAliasInterpolation2d(nn.Module):
         # gaussian function of each dimension.
         kernel = 1
         meshgrids = torch.meshgrid(
-            [
-                torch.arange(size, dtype=torch.float32)
-                for size in kernel_size
-                ]
+            [torch.arange(size, dtype=torch.float32) for size in kernel_size],
+            indexing='ij'
         )
         for size, std, mgrid in zip(kernel_size, sigma, meshgrids):
             mean = (size - 1) / 2

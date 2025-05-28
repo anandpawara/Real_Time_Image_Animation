@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import imageio
 
 import os
-from skimage.draw import circle
+from skimage.draw import disk as circle
 
 import matplotlib.pyplot as plt
 import collections
@@ -48,14 +48,21 @@ class Logger:
             torch.save(cpk, cpk_path)
 
     @staticmethod
-    def load_cpk(checkpoint_path, generator=None, discriminator=None, kp_detector=None,
-                 optimizer_generator=None, optimizer_discriminator=None, optimizer_kp_detector=None):
+    def load_cpk(
+        checkpoint_path,
+        generator=None,
+        discriminator=None,
+        kp_detector=None,
+        optimizer_generator=None,
+        optimizer_discriminator=None,
+        optimizer_kp_detector=None
+    ):
         checkpoint = torch.load(checkpoint_path)
-        if generator is not None:
+        if generator:
             generator.load_state_dict(checkpoint['generator'])
-        if kp_detector is not None:
+        if kp_detector:
             kp_detector.load_state_dict(checkpoint['kp_detector'])
-        if discriminator is not None:
+        if discriminator:
             try:
                discriminator.load_state_dict(checkpoint['discriminator'])
             except:
@@ -168,7 +175,7 @@ class Visualizer:
         images.append(prediction)
 
 
-        ## Occlusion map
+        # Occlusion map
         if 'occlusion_map' in out:
             occlusion_map = out['occlusion_map'].data.cpu().repeat(1, 3, 1, 1)
             occlusion_map = F.interpolate(occlusion_map, size=source.shape[1:3]).numpy()

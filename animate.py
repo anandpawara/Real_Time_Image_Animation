@@ -13,8 +13,14 @@ import numpy as np
 from sync_batchnorm import DataParallelWithCallback
 
 
-def normalize_kp(kp_source, kp_driving, kp_driving_initial, adapt_movement_scale=False,
-                 use_relative_movement=False, use_relative_jacobian=False):
+def normalize_kp(
+    kp_source,
+    kp_driving,
+    kp_driving_initial,
+    adapt_movement_scale=False,
+    use_relative_movement=False,
+    use_relative_jacobian=False
+):
     if adapt_movement_scale:
         source_area = ConvexHull(kp_source['value'][0].data.cpu().numpy()).volume
         driving_area = ConvexHull(kp_driving_initial['value'][0].data.cpu().numpy()).volume
@@ -44,16 +50,13 @@ def animate(config, generator, kp_detector, checkpoint, log_dir, dataset):
     dataset = PairedDataset(initial_dataset=dataset, number_of_pairs=animate_params['num_pairs'])
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
 
-    if checkpoint is not None:
-        Logger.load_cpk(checkpoint, generator=generator, kp_detector=kp_detector)
-    else:
+    if not checkpoint:
         raise AttributeError("Checkpoint should be specified for mode='animate'.")
 
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    Logger.load_cpk(checkpoint, generator=generator, kp_detector=kp_detector)
 
-    if not os.path.exists(png_dir):
-        os.makedirs(png_dir)
+    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(png_dir, exist_ok=True)
 
     if torch.cuda.is_available():
         generator = DataParallelWithCallback(generator)

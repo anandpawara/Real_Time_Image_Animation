@@ -7,20 +7,30 @@ from modules.dense_motion import DenseMotionNetwork
 
 class OcclusionAwareGenerator(nn.Module):
     """
-    Generator that given source image and and keypoints try to transform image according to movement trajectories
+    Generator that given source image and keypoints try to transform image according to movement trajectories
     induced by keypoints. Generator follows Johnson architecture.
     """
 
-    def __init__(self, num_channels, num_kp, block_expansion, max_features, num_down_blocks,
-                 num_bottleneck_blocks, estimate_occlusion_map=False, dense_motion_params=None, estimate_jacobian=False):
+    def __init__(
+        self,
+        num_channels,
+        num_kp,
+        block_expansion,
+        max_features,
+        num_down_blocks,
+        num_bottleneck_blocks,
+        estimate_occlusion_map=False,
+        dense_motion_params=None,
+        estimate_jacobian=False
+    ) -> None:
         super(OcclusionAwareGenerator, self).__init__()
 
-        if dense_motion_params is not None:
-            self.dense_motion_network = DenseMotionNetwork(num_kp=num_kp, num_channels=num_channels,
-                                                           estimate_occlusion_map=estimate_occlusion_map,
-                                                           **dense_motion_params)
-        else:
-            self.dense_motion_network = None
+        self.dense_motion_network = DenseMotionNetwork(
+            num_kp=num_kp,
+            num_channels=num_channels,
+            estimate_occlusion_map=estimate_occlusion_map,
+            **dense_motion_params
+        ) if dense_motion_params else None
 
         self.first = SameBlock2d(num_channels, block_expansion, kernel_size=(7, 7), padding=(3, 3))
 
@@ -47,14 +57,15 @@ class OcclusionAwareGenerator(nn.Module):
         self.estimate_occlusion_map = estimate_occlusion_map
         self.num_channels = num_channels
 
-    def deform_input(self, inp, deformation):
+    @staticmethod
+    def deform_input(inp, deformation):
         _, h_old, w_old, _ = deformation.shape
         _, _, h, w = inp.shape
         if h_old != h or w_old != w:
             deformation = deformation.permute(0, 3, 1, 2)
             deformation = F.interpolate(deformation, size=(h, w), mode='bilinear')
             deformation = deformation.permute(0, 2, 3, 1)
-        return F.grid_sample(inp, deformation)
+        return F.grid_sample(inp, deformation, align_corners=True)
 
     def forward(self, source_image, kp_driving, kp_source):
         # Encoding (downsampling) part
@@ -65,8 +76,9 @@ class OcclusionAwareGenerator(nn.Module):
         # Transforming feature representation according to deformation and occlusion
         output_dict = {}
         if self.dense_motion_network is not None:
-            dense_motion = self.dense_motion_network(source_image=source_image, kp_driving=kp_driving,
-                                                     kp_source=kp_source)
+            dense_motion = self.dense_motion_network(
+                source_image=source_image, kp_driving=kp_driving, kp_source=kp_source
+            )
             output_dict['mask'] = dense_motion['mask']
             output_dict['sparse_deformed'] = dense_motion['sparse_deformed']
 

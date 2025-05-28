@@ -1,5 +1,6 @@
 import os
-from skimage import io, img_as_float32
+from skimage import io
+from skimage.util import img_as_float32
 from skimage.color import gray2rgb
 from sklearn.model_selection import train_test_split
 from imageio import mimread
@@ -60,8 +61,16 @@ class FramesDataset(Dataset):
       - folder with all frames
     """
 
-    def __init__(self, root_dir, frame_shape=(256, 256, 3), id_sampling=False, is_train=True,
-                 random_seed=0, pairs_list=None, augmentation_params=None):
+    def __init__(
+        self,
+        root_dir,
+        frame_shape=(256, 256, 3),
+        id_sampling=False,
+        is_train=True,
+        random_seed=0,
+        pairs_list=None,
+        augmentation_params=None
+    ):
         self.root_dir = root_dir
         self.videos = os.listdir(root_dir)
         self.frame_shape = tuple(frame_shape)
@@ -82,17 +91,9 @@ class FramesDataset(Dataset):
             print("Use random train-test split.")
             train_videos, test_videos = train_test_split(self.videos, random_state=random_seed, test_size=0.2)
 
-        if is_train:
-            self.videos = train_videos
-        else:
-            self.videos = test_videos
-
+        self.videos = train_videos if is_train else test_videos
+        self.transform = AllAugmentationTransform(**augmentation_params) if is_train else None
         self.is_train = is_train
-
-        if self.is_train:
-            self.transform = AllAugmentationTransform(**augmentation_params)
-        else:
-            self.transform = None
 
     def __len__(self):
         return len(self.videos)

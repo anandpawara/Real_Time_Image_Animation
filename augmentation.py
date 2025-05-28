@@ -9,12 +9,10 @@ import numpy as np
 import PIL
 
 from skimage.transform import resize, rotate
-from skimage.util import pad
+from skimage.util import img_as_ubyte, img_as_float
 import torchvision
 
 import warnings
-
-from skimage import img_as_ubyte, img_as_float
 
 
 def crop_clip(clip, min_h, min_w, h, w):
@@ -24,7 +22,7 @@ def crop_clip(clip, min_h, min_w, h, w):
     elif isinstance(clip[0], PIL.Image.Image):
         cropped = [
             img.crop((min_w, min_h, min_w + w, min_h + h)) for img in clip
-            ]
+        ]
     else:
         raise TypeError('Expected numpy.ndarray or PIL.Image' +
                         'but got list of {0}'.format(type(clip[0])))
@@ -36,7 +34,11 @@ def pad_clip(clip, h, w):
     pad_h = (0, 0) if h < im_h else ((h - im_h) // 2, (h - im_h + 1) // 2)
     pad_w = (0, 0) if w < im_w else ((w - im_w) // 2, (w - im_w + 1) // 2)
 
-    return pad(clip, ((0, 0), pad_h, pad_w, (0, 0)), mode='edge')
+    return np.pad(
+        clip,
+        pad_width=((0, 0), pad_h, pad_w, (0, 0)),  # (T, H, W, C)
+        mode='edge'
+    )
 
 
 def resize_clip(clip, size, interpolation='bilinear'):
@@ -233,29 +235,12 @@ class ColorJitter(object):
         self.saturation = saturation
         self.hue = hue
 
-    def get_params(self, brightness, contrast, saturation, hue):
-        if brightness > 0:
-            brightness_factor = random.uniform(
-                max(0, 1 - brightness), 1 + brightness)
-        else:
-            brightness_factor = None
-
-        if contrast > 0:
-            contrast_factor = random.uniform(
-                max(0, 1 - contrast), 1 + contrast)
-        else:
-            contrast_factor = None
-
-        if saturation > 0:
-            saturation_factor = random.uniform(
-                max(0, 1 - saturation), 1 + saturation)
-        else:
-            saturation_factor = None
-
-        if hue > 0:
-            hue_factor = random.uniform(-hue, hue)
-        else:
-            hue_factor = None
+    @staticmethod
+    def get_params(brightness, contrast, saturation, hue):
+        brightness_factor = random.uniform(max(0, 1 - brightness), 1 + brightness) if brightness > 0 else None
+        contrast_factor = random.uniform(max(0, 1 - contrast), 1 + contrast) if contrast > 0 else None
+        saturation_factor = random.uniform(max(0, 1 - saturation), 1 + saturation) if saturation > 0 else None
+        hue_factor = random.uniform(-hue, hue) if hue > 0 else None
         return brightness_factor, contrast_factor, saturation_factor, hue_factor
 
     def __call__(self, clip):
@@ -271,13 +256,13 @@ class ColorJitter(object):
 
             # Create img transform function sequence
             img_transforms = []
-            if brightness is not None:
+            if brightness:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_brightness(img, brightness))
-            if saturation is not None:
+            if saturation:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_saturation(img, saturation))
-            if hue is not None:
+            if hue:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_hue(img, hue))
-            if contrast is not None:
+            if contrast:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_contrast(img, contrast))
             random.shuffle(img_transforms)
             img_transforms = [img_as_ubyte, torchvision.transforms.ToPILImage()] + img_transforms + [np.array,
@@ -297,13 +282,13 @@ class ColorJitter(object):
 
             # Create img transform function sequence
             img_transforms = []
-            if brightness is not None:
+            if brightness:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_brightness(img, brightness))
-            if saturation is not None:
+            if saturation:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_saturation(img, saturation))
-            if hue is not None:
+            if hue:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_hue(img, hue))
-            if contrast is not None:
+            if contrast:
                 img_transforms.append(lambda img: torchvision.transforms.functional.adjust_contrast(img, contrast))
             random.shuffle(img_transforms)
 
@@ -324,19 +309,19 @@ class AllAugmentationTransform:
     def __init__(self, resize_param=None, rotation_param=None, flip_param=None, crop_param=None, jitter_param=None):
         self.transforms = []
 
-        if flip_param is not None:
+        if flip_param:
             self.transforms.append(RandomFlip(**flip_param))
 
-        if rotation_param is not None:
+        if rotation_param:
             self.transforms.append(RandomRotation(**rotation_param))
 
-        if resize_param is not None:
+        if resize_param:
             self.transforms.append(RandomResize(**resize_param))
 
-        if crop_param is not None:
+        if crop_param:
             self.transforms.append(RandomCrop(**crop_param))
 
-        if jitter_param is not None:
+        if jitter_param:
             self.transforms.append(ColorJitter(**jitter_param))
 
     def __call__(self, clip):

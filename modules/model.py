@@ -30,18 +30,20 @@ class Vgg19(torch.nn.Module):
         for x in range(21, 30):
             self.slice5.add_module(str(x), vgg_pretrained_features[x])
 
-        self.mean = torch.nn.Parameter(data=torch.Tensor(np.array([0.485, 0.456, 0.406]).reshape((1, 3, 1, 1))),
-                                       requires_grad=False)
-        self.std = torch.nn.Parameter(data=torch.Tensor(np.array([0.229, 0.224, 0.225]).reshape((1, 3, 1, 1))),
-                                      requires_grad=False)
+        self.mean = torch.nn.Parameter(
+            data=torch.Tensor(np.array([0.485, 0.456, 0.406]).reshape((1, 3, 1, 1))), requires_grad=False
+        )
+        self.std = torch.nn.Parameter(
+            data=torch.Tensor(np.array([0.229, 0.224, 0.225]).reshape((1, 3, 1, 1))), requires_grad=False
+        )
 
         if not requires_grad:
             for param in self.parameters():
                 param.requires_grad = False
 
-    def forward(self, X):
-        X = (X - self.mean) / self.std
-        h_relu1 = self.slice1(X)
+    def forward(self, x):
+        x = (x - self.mean) / self.std
+        h_relu1 = self.slice1(x)
         h_relu2 = self.slice2(h_relu1)
         h_relu3 = self.slice3(h_relu2)
         h_relu4 = self.slice4(h_relu3)
@@ -79,10 +81,13 @@ class Transform:
 
         if ('sigma_tps' in kwargs) and ('points_tps' in kwargs):
             self.tps = True
-            self.control_points = make_coordinate_grid((kwargs['points_tps'], kwargs['points_tps']), type=noise.type())
+            self.control_points = make_coordinate_grid(
+                (kwargs['points_tps'], kwargs['points_tps']), type=noise.type()
+            )
             self.control_points = self.control_points.unsqueeze(0)
-            self.control_params = torch.normal(mean=0,
-                                               std=kwargs['sigma_tps'] * torch.ones([bs, 1, kwargs['points_tps'] ** 2]))
+            self.control_params = torch.normal(
+                mean=0, std=kwargs['sigma_tps'] * torch.ones([bs, 1, kwargs['points_tps'] ** 2])
+            )
         else:
             self.tps = False
 
@@ -90,7 +95,7 @@ class Transform:
         grid = make_coordinate_grid(frame.shape[2:], type=frame.type()).unsqueeze(0)
         grid = grid.view(1, frame.shape[2] * frame.shape[3], 2)
         grid = self.warp_coordinates(grid).view(self.bs, frame.shape[2], frame.shape[3], 2)
-        return F.grid_sample(frame, grid, padding_mode="reflection")
+        return F.grid_sample(frame, grid, padding_mode="reflection", align_corners=True)
 
     def warp_coordinates(self, coordinates):
         theta = self.theta.type(coordinates.type())
@@ -200,12 +205,12 @@ class GeneratorFullModel(torch.nn.Module):
             generated['transformed_frame'] = transformed_frame
             generated['transformed_kp'] = transformed_kp
 
-            ## Value loss part
+            # Value loss part
             if self.loss_weights['equivariance_value'] != 0:
                 value = torch.abs(kp_driving['value'] - transform.warp_coordinates(transformed_kp['value'])).mean()
                 loss_values['equivariance_value'] = self.loss_weights['equivariance_value'] * value
 
-            ## jacobian loss part
+            # jacobian loss part
             if self.loss_weights['equivariance_jacobian'] != 0:
                 jacobian_transformed = torch.matmul(transform.jacobian(transformed_kp['value']),
                                                     transformed_kp['jacobian'])

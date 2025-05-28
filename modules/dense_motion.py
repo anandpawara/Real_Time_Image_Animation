@@ -9,18 +9,30 @@ class DenseMotionNetwork(nn.Module):
     Module that predicting a dense motion from sparse motion representation given by kp_source and kp_driving
     """
 
-    def __init__(self, block_expansion, num_blocks, max_features, num_kp, num_channels, estimate_occlusion_map=False,
-                 scale_factor=1, kp_variance=0.01):
+    def __init__(
+        self,
+        block_expansion,
+        num_blocks,
+        max_features,
+        num_kp,
+        num_channels,
+        estimate_occlusion_map=False,
+        scale_factor=1,
+        kp_variance=0.01
+    ) -> None:
         super(DenseMotionNetwork, self).__init__()
-        self.hourglass = Hourglass(block_expansion=block_expansion, in_features=(num_kp + 1) * (num_channels + 1),
-                                   max_features=max_features, num_blocks=num_blocks)
+        self.hourglass = Hourglass(
+            block_expansion=block_expansion,
+            in_features=(num_kp + 1) * (num_channels + 1),
+            max_features=max_features,
+            num_blocks=num_blocks
+        )
 
         self.mask = nn.Conv2d(self.hourglass.out_filters, num_kp + 1, kernel_size=(7, 7), padding=(3, 3))
 
-        if estimate_occlusion_map:
-            self.occlusion = nn.Conv2d(self.hourglass.out_filters, 1, kernel_size=(7, 7), padding=(3, 3))
-        else:
-            self.occlusion = None
+        self.occlusion = nn.Conv2d(
+            self.hourglass.out_filters, 1, kernel_size=(7, 7), padding=(3, 3)
+        ) if estimate_occlusion_map else None
 
         self.num_kp = num_kp
         self.scale_factor = scale_factor
@@ -38,7 +50,7 @@ class DenseMotionNetwork(nn.Module):
         gaussian_source = kp2gaussian(kp_source, spatial_size=spatial_size, kp_variance=self.kp_variance)
         heatmap = gaussian_driving - gaussian_source
 
-        #adding background feature
+        # adding background feature
         zeros = torch.zeros(heatmap.shape[0], 1, spatial_size[0], spatial_size[1]).type(heatmap.type())
         heatmap = torch.cat([zeros, heatmap], dim=1)
         heatmap = heatmap.unsqueeze(2)
@@ -61,7 +73,7 @@ class DenseMotionNetwork(nn.Module):
 
         driving_to_source = coordinate_grid + kp_source['value'].view(bs, self.num_kp, 1, 1, 2)
 
-        #adding background feature
+        # adding background feature
         identity_grid = identity_grid.repeat(bs, 1, 1, 1, 1)
         sparse_motions = torch.cat([identity_grid, driving_to_source], dim=1)
         return sparse_motions
@@ -74,7 +86,7 @@ class DenseMotionNetwork(nn.Module):
         source_repeat = source_image.unsqueeze(1).unsqueeze(1).repeat(1, self.num_kp + 1, 1, 1, 1, 1)
         source_repeat = source_repeat.view(bs * (self.num_kp + 1), -1, h, w)
         sparse_motions = sparse_motions.view((bs * (self.num_kp + 1), h, w, -1))
-        sparse_deformed = F.grid_sample(source_repeat, sparse_motions)
+        sparse_deformed = F.grid_sample(source_repeat, sparse_motions, align_corners=True)
         sparse_deformed = sparse_deformed.view((bs, self.num_kp + 1, -1, h, w))
         return sparse_deformed
 
